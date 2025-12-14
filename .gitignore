@@ -42,6 +42,12 @@ lerna-debug.log*
 .env.production.local
 .env.local
 
+# Google credentials (NEVER commit these!)
+credentials.json
+*-credentials.json
+*.json.enc
+google-credentials*.json
+
 # temp directory
 .temp
 .tmp
