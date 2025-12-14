@@ -15,15 +15,9 @@ export class GoogleSheetsService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    try {
-      await this.initializeSheets();
-      console.log('✓ Google Sheets service initialized successfully');
-    } catch (error) {
-      console.error('⚠ Warning: Google Sheets initialization failed:', error.message);
-      console.error('⚠ The app will start, but /bonuses endpoint will fail until credentials are configured');
-      // Don't throw - let the app start even if Google Sheets isn't configured
-      this.isInitialized = false;
-    }
+    // Don't initialize on module init - do it lazily when getBonuses is called
+    // This prevents memory issues and allows the app to start even without credentials
+    console.log('Google Sheets service loaded (will initialize on first request)');
   }
 
   /**
@@ -70,7 +64,12 @@ export class GoogleSheetsService implements OnModuleInit {
     return `https://drive.usercontent.google.com/download?id=${fileId}&export=view&authuser=0`;
   }
 
-  private async initializeSheets() {
+  private async initializeSheets(): Promise<void> {
+    // Prevent multiple simultaneous initializations
+    if (this.isInitialized) {
+      return;
+    }
+
     // Option 1: Use JSON credentials file (preferred - simpler and avoids key parsing issues)
     const credentialsPath = this.configService.get<string>('GOOGLE_APPLICATION_CREDENTIALS');
     
@@ -86,8 +85,9 @@ export class GoogleSheetsService implements OnModuleInit {
         this.isInitialized = true;
         return;
       } catch (error) {
-        console.error('Error initializing with credentials file:', error.message);
-        throw new Error(`Failed to initialize Google Sheets with credentials file: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error('Error initializing with credentials file:', errorMessage);
+        throw new Error(`Failed to initialize Google Sheets with credentials file: ${errorMessage}`);
       }
     }
 
@@ -105,8 +105,9 @@ export class GoogleSheetsService implements OnModuleInit {
         this.isInitialized = true;
         return;
       } catch (error) {
-        console.error('Error initializing with credentials JSON:', error.message);
-        throw new Error(`Failed to initialize Google Sheets with credentials JSON: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error('Error initializing with credentials JSON:', errorMessage);
+        throw new Error(`Failed to initialize Google Sheets with credentials JSON: ${errorMessage}`);
       }
     }
 
@@ -134,17 +135,20 @@ export class GoogleSheetsService implements OnModuleInit {
       this.sheets = google.sheets({ version: 'v4', auth: jwtClient });
       this.isInitialized = true;
     } catch (error) {
-      console.error('Error initializing Google Sheets auth:', error);
-      throw new Error(`Failed to initialize Google Sheets authentication: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Error initializing Google Sheets auth:', errorMessage);
+      throw new Error(`Failed to initialize Google Sheets authentication: ${errorMessage}`);
     }
   }
 
   async getBonuses(): Promise<BonusDto[]> {
+    // Lazy initialization - only initialize when actually needed
     if (!this.isInitialized) {
       try {
         await this.initializeSheets();
       } catch (error) {
-        console.error('Failed to initialize Google Sheets:', error.message);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error('Failed to initialize Google Sheets:', errorMessage);
         throw new Error('Google Sheets service is not configured. Please set GOOGLE_SHEET_ID and authentication credentials.');
       }
     }
@@ -191,8 +195,9 @@ export class GoogleSheetsService implements OnModuleInit {
 
       return bonuses;
     } catch (error) {
-      console.error('Error reading from Google Sheets:', error);
-      throw new Error('Failed to read bonuses from Google Sheets');
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Error reading from Google Sheets:', errorMessage);
+      throw new Error(`Failed to read bonuses from Google Sheets: ${errorMessage}`);
     }
   }
 }
