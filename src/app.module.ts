@@ -1,4 +1,4 @@
-import { GoogleSheetsService } from './google-sheets/google-sheets.service';
+import { FirestoreService } from './firestore/firestore.service';
 import { BonusesController } from './bonuses/bonuses.controller';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -13,6 +13,6 @@ import { AppService } from './app.service';
     }),
   ],
   controllers: [BonusesController],
-  providers: [GoogleSheetsService],
+  providers: [FirestoreService],
 })
 export class AppModule {}

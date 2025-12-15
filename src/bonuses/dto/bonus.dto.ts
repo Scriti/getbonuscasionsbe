@@ -1,4 +1,5 @@
 export class BonusDto {
+  id: string;
   brandName: string;
   logo: string;
   welcomeBonus: string;
@@ -7,6 +8,7 @@ export class BonusDto {
   minDeposit: string;
   trackingLink: string;
   tags: string[];
+  type: string | null;
 }
 
 

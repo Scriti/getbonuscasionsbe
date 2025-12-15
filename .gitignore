@@ -42,11 +42,13 @@ lerna-debug.log*
 .env.production.local
 .env.local
 
-# Google credentials (NEVER commit these!)
-credentials.json
+# Firebase/Firestore credentials (NEVER commit these!)
+firestore-credentials.json
 *-credentials.json
+credentials.json
 *.json.enc
 google-credentials*.json
+firebase-credentials*.json
 
 # temp directory
 .temp

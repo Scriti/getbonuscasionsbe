@@ -1,14 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
-import { GoogleSheetsService } from '../google-sheets/google-sheets.service';
+import { FirestoreService } from '../firestore/firestore.service';
 import { BonusDto } from './dto/bonus.dto';
 
 @Controller('bonuses')
 export class BonusesController {
-  constructor(private readonly googleSheetsService: GoogleSheetsService) {}
+  constructor(private readonly firestoreService: FirestoreService) {}
 
   @Get()
   async getBonuses(): Promise<BonusDto[]> {
-    return this.googleSheetsService.getBonuses();
+    return this.firestoreService.getBonuses();
   }
 
   @Get('health')
